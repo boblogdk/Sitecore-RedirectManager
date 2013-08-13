@@ -41,7 +41,7 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
       using (new SiteContextSwitcher(SiteContext.GetSite("website")))
       {
         _startItem = Context.Site.StartItem.ToLower();
-        _virtualFolder = GetVirtualVolder();
+        _virtualFolder = GetVirtualFolder();
       }
 
       _urlOptions = new UrlOptions { LanguageEmbedding = LanguageEmbedding.Never, AddAspxExtension = true };
@@ -51,7 +51,7 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
     /// Gets the virtual volder for the context site.
     /// </summary>
     /// <returns>Virtual folder for the context site</returns>
-    public static string GetVirtualVolder()
+    public static string GetVirtualFolder()
     {
         return Context.Site.VirtualFolder != "/" ? Context.Site.VirtualFolder.TrimEnd('/') : string.Empty;
     }
@@ -76,7 +76,7 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
         if (currentSite)
         {
           currentStartItem = Context.Site.StartItem.ToLower();
-          currentVirtualFolder = GetVirtualVolder();
+          currentVirtualFolder = GetVirtualFolder();
         }
         else
         {
