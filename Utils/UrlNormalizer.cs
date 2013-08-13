@@ -38,7 +38,7 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
     /// </summary>
     public static void Initialize()
     {
-      using (new SiteContextSwitcher(SiteContext.GetSite("website")))
+      using (new SiteContextSwitcher(SiteContext.GetSite(Context.Site.Name)))
       {
         _startItem = Context.Site.StartItem.ToLower();
         _virtualFolder = GetVirtualFolder();
