@@ -5,14 +5,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Redirects Report</title>
-    <link rel="stylesheet" href="/css/redirect_manager.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/redirect_manager.min.css" type="text/css" />
 </head>
 <body>
     <form id="form1" runat="server">
-    <div class="main">
-        <asp:TreeView ID="Redirects" runat="server" EnableViewState="True">
-        </asp:TreeView>
-    </div>
+        <div class="main">
+            <asp:TreeView ID="Redirects" runat="server" EnableViewState="True">
+            </asp:TreeView>
+        </div>
     </form>
 </body>
 </html>

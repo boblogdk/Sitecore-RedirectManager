@@ -6,14 +6,13 @@
 //   Defines the UrlValidator type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+using System;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using Sitecore.Data.Validators;
 
 namespace Sitecore.SharedSource.RedirectManager
 {
-  using System;
-  using System.Runtime.Serialization;
-  using System.Text.RegularExpressions;
-
-  using Sitecore.Data.Validators;
 
   /// <summary>
   /// UrlValidator class

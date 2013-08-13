@@ -6,12 +6,12 @@
 //   Defines the NormalizeUrl type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+using Sitecore.Data.Items;
+using Sitecore.Links;
+using Sitecore.Sites;
 
 namespace Sitecore.SharedSource.RedirectManager.Utils
 {
-  using Sitecore.Data.Items;
-  using Sitecore.Links;
-  using Sitecore.Sites;
 
   /// <summary>
   ///  NormalizeUrl class
@@ -21,17 +21,17 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
     /// <summary>
     ///  Start item for the website
     /// </summary>
-    private static string startItem;
+    private static string _startItem;
 
     /// <summary>
     ///  Virtual folder for the website
     /// </summary>
-    private static string virtualFolder;
+    private static string _virtualFolder;
 
     /// <summary>
     ///  Url options
     /// </summary>
-    private static UrlOptions urlOptions;
+    private static UrlOptions _urlOptions;
 
     /// <summary>
     /// Initializes this instance.
@@ -40,11 +40,11 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
     {
       using (new SiteContextSwitcher(SiteContext.GetSite("website")))
       {
-        startItem = Context.Site.StartItem.ToLower();
-        virtualFolder = GetVirtualVolder();
+        _startItem = Context.Site.StartItem.ToLower();
+        _virtualFolder = GetVirtualVolder();
       }
 
-      urlOptions = new UrlOptions { LanguageEmbedding = LanguageEmbedding.Never, AddAspxExtension = true };
+      _urlOptions = new UrlOptions { LanguageEmbedding = LanguageEmbedding.Never, AddAspxExtension = true };
     }
 
     /// <summary>
@@ -80,8 +80,8 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
         }
         else
         {
-          currentStartItem = startItem;
-          currentVirtualFolder = virtualFolder;
+          currentStartItem = _startItem;
+          currentVirtualFolder = _virtualFolder;
         }
 
         if (url != "/")
@@ -152,9 +152,9 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
     /// </returns>
     public static string RemovePageExtension(string url)
     {
-      const string Aspx = ".aspx";
+      const string aspx = ".aspx";
 
-      return url.EndsWith(Aspx) ? url.Substring(0, url.LastIndexOf(Aspx, System.StringComparison.Ordinal)) : url;
+      return url.EndsWith(aspx) ? url.Substring(0, url.LastIndexOf(aspx, System.StringComparison.Ordinal)) : url;
     }
 
     /// <summary>
@@ -169,9 +169,9 @@ namespace Sitecore.SharedSource.RedirectManager.Utils
         return string.Empty;
       }
 
-      using (new SiteContextSwitcher(SiteContext.GetSite("website")))
+      using (new SiteContextSwitcher(SiteContext.GetSite(Context.Site.Name)))
       {
-        return LinkManager.GetItemUrl(item, urlOptions).ToLower();
+        return LinkManager.GetItemUrl(item, _urlOptions).ToLower();
       }
     }
 

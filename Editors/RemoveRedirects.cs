@@ -6,81 +6,80 @@
 //   Defines the RemoveRedirects type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+using System;
+using System.Globalization;
+using System.Linq;
+using Sitecore.Configuration;
+using Sitecore.Globalization;
+using Sitecore.SharedSource.RedirectManager.Utils;
+using Sitecore.Shell.Framework.Commands;
+using Sitecore.Web.UI.Sheer;
 
 namespace Sitecore.SharedSource.RedirectManager.Editors
 {
-  using System;
-  using System.Globalization;
-  using System.Linq;
-  using Sitecore.Configuration;
-  using Sitecore.Globalization;
-  using Sitecore.SharedSource.RedirectManager.Utils;
-  using Sitecore.Shell.Framework.Commands;
-  using Sitecore.Web.UI.Sheer;
-
-  /// <summary>
-  /// The remove old redirects type
-  /// </summary>
-  public class RemoveRedirects : Command
-  {
     /// <summary>
-    /// Executes the command in the specified context.
+    /// The remove old redirects type
     /// </summary>
-    /// <param name="context">The context.</param>
-    public override void Execute([NotNull]CommandContext context)
+    public class RemoveRedirects : Command
     {
-      var clientArgs = new ClientPipelineArgs();
-      Context.ClientPage.Start(this, "DialogProcessor", clientArgs);
-    }
-
-    /// <summary>
-    /// Dialogs the processor.
-    /// </summary>
-    /// <param name="args">The arguments.</param>
-    protected void DialogProcessor(ClientPipelineArgs args)
-    {
-      if (args.IsPostBack)
-      {
-        if (args.Result == "yes")
+        /// <summary>
+        /// Executes the command in the specified context.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        public override void Execute([NotNull]CommandContext context)
         {
-          var rootItem = Factory.GetDatabase(Configuration.Database).GetItem(Items.ItemIDs.RedirectsFolderItem);
+            var clientArgs = new ClientPipelineArgs();
+            Context.ClientPage.Start(this, "DialogProcessor", clientArgs);
+        }
 
-          if (rootItem == null)
-          {
-            return;
-          }
+        /// <summary>
+        /// Dialogs the processor.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        protected void DialogProcessor(ClientPipelineArgs args)
+        {
+            if (args.IsPostBack)
+            {
+                if (args.Result == "yes")
+                {
+                    var rootItem = Factory.GetDatabase(Configuration.Database).GetItem(Items.ItemIDs.RedirectsFolderItem);
 
-          var children = rootItem.Axes.GetDescendants();
+                    if (rootItem == null)
+                    {
+                        return;
+                    }
 
-          if (!children.Any())
-          {
-            return;
-          }
+                    var children = rootItem.Axes.GetDescendants();
 
-          var currentDate = DateTime.Now;
-          foreach (var item in from item in children.Where(x => x.IsItemOfType(Templates.Settings.TemplateId))
-                               let settings = new Templates.Settings(item)
-                               where (currentDate - settings.LastUse.DateTime).Days >= Configuration.RemovalDate & (currentDate - settings.InnerItem.Statistics.Created.Date).Days >= Configuration.RemovalDate
-                               select item)
-          {
-            item.Delete();
-          }
+                    if (!children.Any())
+                    {
+                        return;
+                    }
 
-          var load = string.Concat(new object[]
+                    var currentDate = DateTime.Now;
+                    foreach (var item in from item in children.Where(x => x.IsItemOfType(Templates.Settings.TemplateId))
+                                         let settings = new Templates.Settings(item)
+                                         where (currentDate - settings.LastUse.DateTime).Days >= Configuration.RemovalDate & (currentDate - settings.InnerItem.Statistics.Created.Date).Days >= Configuration.RemovalDate
+                                         select item)
+                    {
+                        item.Delete();
+                    }
+
+                    var load = string.Concat(new object[]
           {
             "item:load(id=", rootItem.ID, ",language=", rootItem.Language, ",version=", rootItem.Version, ")"
           });
-          Context.ClientPage.SendMessage(this, load);
+                    Context.ClientPage.SendMessage(this, load);
 
-          var refresh = string.Format("item:refreshchildren(id={0})", rootItem.Parent.ID);
-          Context.ClientPage.ClientResponse.Timer(refresh, 2);
+                    var refresh = string.Format("item:refreshchildren(id={0})", rootItem.Parent.ID);
+                    Context.ClientPage.ClientResponse.Timer(refresh, 2);
+                }
+            }
+            else
+            {
+                Context.ClientPage.ClientResponse.Confirm(Translate.Text("Redirect_Remove Old Redirects").Replace("[0]", Configuration.RemovalDate.ToString(CultureInfo.InvariantCulture)));
+                args.WaitForPostBack();
+            }
         }
-      }
-      else
-      {
-        Context.ClientPage.ClientResponse.Confirm(Translate.Text("Redirect_Remove Old Redirects").Replace("[0]", Configuration.RemovalDate.ToString(CultureInfo.InvariantCulture)));
-        args.WaitForPostBack();
-      }
     }
-  }
 }

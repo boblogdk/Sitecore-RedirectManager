@@ -6,19 +6,19 @@
 //   ItemEventHandler class
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+using System;
+using Sitecore.Data.Items;
+using Sitecore.Diagnostics;
+using Sitecore.Events;
+using Sitecore.SharedSource.RedirectManager.Templates;
 
 namespace Sitecore.SharedSource.RedirectManager
 {
-  using System;
-  using Sitecore.Data.Items;
-  using Sitecore.Diagnostics;
-  using Sitecore.Events;
-  using Sitecore.SharedSource.RedirectManager.Templates;
 
   /// <summary>
   /// ItemEventHandler class
   /// </summary>
-  public class RedirectItemEventHendler
+  public class RedirectItemEventHandler
   {
     /// <summary>
     /// Called when the item has saved.
@@ -34,12 +34,12 @@ namespace Sitecore.SharedSource.RedirectManager
 
       var item = Event.ExtractParameter(args, 0) as Item;
       Assert.IsNotNull(item, "No item in parameters");
-      if (item.Database.Name != Configuration.Database)
+      if (item != null && item.Database.Name != Configuration.Database)
       {
         return;
       }
 
-      if (item.ID.ToString() == Items.ItemIDs.RedirectsFolderItem)
+      if (item != null && item.ID.ToString() == Items.ItemIDs.RedirectsFolderItem)
       {
         RedirectProcessor.CreateListOfRedirects();
       }
@@ -74,31 +74,34 @@ namespace Sitecore.SharedSource.RedirectManager
       var eventArgs = args as Data.Events.ItemSavedRemoteEventArgs;
       Assert.IsNotNull(eventArgs, "ItemSavedRemoteEventArgs is null");
 
-      var item = eventArgs.Item;
-      Assert.IsNotNull(item, "No item in parameters");
-      if (item.Database.Name != Configuration.Database)
-      {
-        return;
-      }
+        if (eventArgs != null)
+        {
+            var item = eventArgs.Item;
+            Assert.IsNotNull(item, "No item in parameters");
+            if (item.Database.Name != Configuration.Database)
+            {
+                return;
+            }
 
-      if (item.ID.ToString() == Items.ItemIDs.RedirectsFolderItem)
-      {
-        RedirectProcessor.CreateListOfRedirects();
-      }
+            if (item.ID.ToString() == Items.ItemIDs.RedirectsFolderItem)
+            {
+                RedirectProcessor.CreateListOfRedirects();
+            }
 
-      if (!CheckTemplate(item))
-      {
-        return;
-      }
+            if (!CheckTemplate(item))
+            {
+                return;
+            }
 
-      if (Configuration.RebuildRedirectsList)
-      {
-        RedirectProcessor.CreateListOfRedirects();
-      }
-      else
-      {
-        RedirectProcessor.UpdateRedirect(item);
-      }
+            if (Configuration.RebuildRedirectsList)
+            {
+                RedirectProcessor.CreateListOfRedirects();
+            }
+            else
+            {
+                RedirectProcessor.UpdateRedirect(item);
+            }
+        }
     }
 
     /// <summary>
@@ -115,7 +118,7 @@ namespace Sitecore.SharedSource.RedirectManager
 
       var item = Event.ExtractParameter(args, 0) as Item;
       Assert.IsNotNull(item, "No item in parameters");
-      if (item.Database.Name != Configuration.Database)
+      if (item != null && item.Database.Name != Configuration.Database)
       {
         return;
       }
@@ -143,20 +146,23 @@ namespace Sitecore.SharedSource.RedirectManager
       var eventArgs = args as Data.Events.ItemDeletedRemoteEventArgs;
       Assert.IsNotNull(eventArgs, "ItemSavedRemoteEventArgs is null");
 
-      var item = eventArgs.Item;
-      Assert.IsNotNull(item, "No item in parameters");
+        if (eventArgs != null)
+        {
+            var item = eventArgs.Item;
+            Assert.IsNotNull(item, "No item in parameters");
 
-      if (item.Database.Name != Configuration.Database)
-      {
-        return;
-      }
+            if (item.Database.Name != Configuration.Database)
+            {
+                return;
+            }
 
-      if (!CheckTemplate(item))
-      {
-        return;
-      }
+            if (!CheckTemplate(item))
+            {
+                return;
+            }
 
-      RedirectProcessor.RemoveRedirect(item);
+            RedirectProcessor.RemoveRedirect(item);
+        }
     }
 
     /// <summary>
